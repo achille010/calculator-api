@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🧮 Calculator API Express
+# Calculator API Express
 
 [![npm version](https://img.shields.io/npm/v/calculator-api-express.svg?style=for-the-badge&logo=npm&logoColor=white&color=CB3837)](https://www.npmjs.com/package/calculator-api-express)
 [![npm downloads](https://img.shields.io/npm/dm/calculator-api-express.svg?style=for-the-badge&logo=npm&logoColor=white&color=CB3837)](https://www.npmjs.com/package/calculator-api-express)
