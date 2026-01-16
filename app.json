@@ -1,0 +1,772 @@
+{
+	"info": {
+		"_postman_id": "3df4e661-14f0-4cd8-be9b-650d15104881",
+		"name": "Calculator-API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "51238969",
+		"_collection_link": "https://ishyarugemachille4-5520790.postman.co/workspace/ISHYA-RUGEMA-Achille's-Workspac~e993b40c-e1f6-41fe-84d7-f9f77b151da5/collection/51238969-3df4e661-14f0-4cd8-be9b-650d15104881?action=share&source=collection_link&creator=51238969"
+	},
+	"item": [
+		{
+			"name": "Root",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/add?a=35&b=23",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"add"
+					],
+					"query": [
+						{
+							"key": "a",
+							"value": "35"
+						},
+						{
+							"key": "b",
+							"value": "23"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add(JSON)",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \"a\": 1, \"b\": 2}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/add",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"add"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/add?a=35&b=23",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"add"
+					],
+					"query": [
+						{
+							"key": "a",
+							"value": "35"
+						},
+						{
+							"key": "b",
+							"value": "23"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "subtract",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/subtract?a=35&b=23",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"subtract"
+					],
+					"query": [
+						{
+							"key": "a",
+							"value": "35"
+						},
+						{
+							"key": "b",
+							"value": "23"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "subtract(JSON)",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"a\" : 10, \"b\" : 3}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/subtract",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"subtract"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "subtract",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/subtract?a=35&b=23",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"subtract"
+					],
+					"query": [
+						{
+							"key": "a",
+							"value": "35"
+						},
+						{
+							"key": "b",
+							"value": "23"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "multiply",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:3000/multiply?a=35&b=23",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"multiply"
+					],
+					"query": [
+						{
+							"key": "a",
+							"value": "35"
+						},
+						{
+							"key": "b",
+							"value": "23"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "multiply(JSON)",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \"a\" : 6, \"b\" : 7}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/multiply",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"multiply"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "multiply",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:3000/multiply?a=35&b=23",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"multiply"
+					],
+					"query": [
+						{
+							"key": "a",
+							"value": "35"
+						},
+						{
+							"key": "b",
+							"value": "23"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "divide(error)",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \"a\" : 1, \"b\" : 0}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/divide",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"divide"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "divide(JSON)",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \"a\" : 4, \"b\" : 3}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/divide",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"divide"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "divide",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/divide?a=35&b=23",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"divide"
+					],
+					"query": [
+						{
+							"key": "a",
+							"value": "35"
+						},
+						{
+							"key": "b",
+							"value": "23"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "divide",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/divide?a=35&b=23",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"divide"
+					],
+					"query": [
+						{
+							"key": "a",
+							"value": "35"
+						},
+						{
+							"key": "b",
+							"value": "23"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "power",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/power?a=2&b=3",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"power"
+					],
+					"query": [
+						{
+							"key": "a",
+							"value": "2"
+						},
+						{
+							"key": "b",
+							"value": "3"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "power(JSON)",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \"a\" : 2, \"b\" : 3}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/power",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"power"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "power",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/power?a=2&b=3",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"power"
+					],
+					"query": [
+						{
+							"key": "a",
+							"value": "2"
+						},
+						{
+							"key": "b",
+							"value": "3"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "factorial(edge case 0)",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/factorial/0",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"factorial",
+						"0"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "factorial(edge case 1)",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:3000/factorial/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"factorial",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "factorial(invalid)",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:3000/factorial/-4",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"factorial",
+						"-4"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "factorial",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/factorial/5",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"factorial",
+						"5"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "sum array(invalid - empty)",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \"numbers\": []}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/sumarray",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"sumarray"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "sumarray invalid - nonnumbers",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \"numbers\": [1, 2, 3, 4, 5, \"a\"]}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/sumarray",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"sumarray"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Sum array",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"numbers\": [1, 2, 3, 4, 5]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/sumarray",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"sumarray"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "History",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/history",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"history"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "sumarray invalid - string",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \"numbers\" : \"1,2,3\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/sumarray",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"sumarray"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
