@@ -35,7 +35,7 @@ export const serverOn = (port = 3000) => {
           <code style="color: #4af626; 
                       font-family: 'Courier New', Courier, monospace; 
                       font-size: 1.5rem;">
-              > Welcome to our first API_
+              > Welcome to first API_
           </code>
         </div>`);
   });
