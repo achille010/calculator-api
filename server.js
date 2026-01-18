@@ -16,7 +16,7 @@ export const serverOn = (port = 3000) => {
   app.use(express.json());
   app.use(logger);
 
-  app.use(controlAccess)
+  app.use(controlAccess);
   app.use("/add", add);
   app.use("/subtract", subtract);
   app.use("/divide", divide);
@@ -38,6 +38,9 @@ export const serverOn = (port = 3000) => {
               > Welcome to our calculator API_
           </code>
         </div>`);
+    res.json({
+      message: "server running on http://localhost:{specified_port} !",
+    });
   });
 
   app.listen(port, () => {
