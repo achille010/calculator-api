@@ -44,6 +44,6 @@ export const serverOn = (port = 3000) => {
   });
 
   app.listen(port, () => {
-    console.log(`Calculator API on http://localhost:${port}`);
+    console.log(`Calculator API running on http://localhost:${port}`);
   });
 };
