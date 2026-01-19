@@ -39,7 +39,7 @@ export const serverOn = (port = 3000) => {
           </code>
         </div>`);
     res.json({
-      message: "server running on http://localhost:{specified_port} !",
+      message: "Calculator-api running on http://localhost:{specified_port} !",
     });
   });
 
