@@ -1,6 +1,6 @@
 {
   "name": "calculator-api-express",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "A modular calculator API built with Express",
   "type": "module",
   "main": "index.js",
