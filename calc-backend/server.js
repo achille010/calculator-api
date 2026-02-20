@@ -9,6 +9,7 @@ import power from "./routes/power.js";
 import summarray from "./routes/summarray.js";
 import { logger } from "./middleware/logger.js";
 import { controlAccess } from "./middleware/access.js";
+import sine from "./routes/sine.js";
 
 export const serverOn = (port = 3000) => {
   const app = express();
@@ -25,6 +26,7 @@ export const serverOn = (port = 3000) => {
   app.use("/power", power);
   app.use("/sumarray", summarray);
   app.use("/history", history);
+  app.use("/sine", sine);
 
   app.get("/", (req, res) => {
     res.send(`
@@ -38,9 +40,6 @@ export const serverOn = (port = 3000) => {
               > Welcome to our calculator API_
           </code>
         </div>`);
-    res.json({
-      message: "Calculator-api running on http://localhost:{specified_port} !",
-    });
   });
 
   app.listen(port, () => {
