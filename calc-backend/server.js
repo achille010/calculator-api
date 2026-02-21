@@ -1,4 +1,5 @@
 import express from "express";
+
 import add from "./routes/add.js";
 import subtract from "./routes/subtract.js";
 import divide from "./routes/div.js";
@@ -7,9 +8,11 @@ import factorial from "./routes/factorial.js";
 import history from "./routes/history.js";
 import power from "./routes/power.js";
 import summarray from "./routes/summarray.js";
+import sine from "./routes/sine.js";
+import cosine from "./routes/cosine.js"
+
 import { logger } from "./middleware/logger.js";
 import { controlAccess } from "./middleware/access.js";
-import sine from "./routes/sine.js";
 
 export const serverOn = (port = 3000) => {
   const app = express();
@@ -26,7 +29,8 @@ export const serverOn = (port = 3000) => {
   app.use("/power", power);
   app.use("/sumarray", summarray);
   app.use("/history", history);
-  app.use("/sine", sine);
+  app.use("/sin", sine);
+  app.use("/cos", cosine);
 
   app.get("/", (req, res) => {
     res.send(`
