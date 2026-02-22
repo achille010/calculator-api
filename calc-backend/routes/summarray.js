@@ -19,7 +19,7 @@ router.post("/", (req, res) => {
   addHistory({
     Operation: "Array addition",
     Operands: [...numbers],
-    Outcome: result,
+    Result: result,
   });
   res.json({ result });
 });

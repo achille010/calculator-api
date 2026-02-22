@@ -7,14 +7,14 @@ const router = express.Router();
 router.get("/", validateNums, (req, res) => {
   const { a, b } = req.numbers;
   const result = a + b;
-  addHistory({ Operation: "Addition", Operands: [a, b], Outcome: result });
+  addHistory({ Operation: "Addition", Operands: [a, b], Result: result });
   res.json({ result });
 });
 
 router.post("/", validateNums, (req, res) => {
   const { a, b } = req.numbers;
   const result = a + b;
-  addHistory({ Operation: "Addition", Operands: [a, b], Outcome: result });
+  addHistory({ Operation: "Addition", Operands: [a, b], Result: result });
   res.json({ result });
 });
 

@@ -11,11 +11,13 @@ function App() {
   const [currentOperator, setCurrentOperator] = useState(null)
   const [history, setHistory] = useState([])
   const [isNewInput, setIsNewInput] = useState(true)
-  const [activeKey, setActiveKey] = useState(null) // For keyboard visualizer
+  const [activeKey, setActiveKey] = useState(null)
+  const [isDeg, setIsDeg] = useState(true)
+  const [ans, setAns] = useState(0)
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false)
 
   const audioContextRef = useRef(null)
 
-  // Initialize AudioContext on first interaction
   const initAudio = () => {
     if (!audioContextRef.current) {
       audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)()
@@ -25,50 +27,53 @@ function App() {
     }
   }
 
-  // Synthesize a "Realistic Typing Click" sound
   const playClick = useCallback(() => {
     if (!audioContextRef.current) return
-
     const ctx = audioContextRef.current
     const now = ctx.currentTime
-
-    // 1. Percussive "Snap" (High-frequency noise)
     const noiseBuffer = ctx.createBuffer(1, ctx.sampleRate * 0.02, ctx.sampleRate)
     const noiseData = noiseBuffer.getChannelData(0)
     for (let i = 0; i < noiseData.length; i++) noiseData[i] = Math.random() * 2 - 1
-
     const noiseSource = ctx.createBufferSource()
     noiseSource.buffer = noiseBuffer
-
     const noiseFilter = ctx.createBiquadFilter()
     noiseFilter.type = 'highpass'
     noiseFilter.frequency.setValueAtTime(2000, now)
-
     const noiseGain = ctx.createGain()
     noiseGain.gain.setValueAtTime(0.08, now)
     noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.02)
-
     noiseSource.connect(noiseFilter)
     noiseFilter.connect(noiseGain)
     noiseGain.connect(ctx.destination)
-
-    // 2. The "Thump" (Body of the key press)
     const osc = ctx.createOscillator()
     const oscGain = ctx.createGain()
     osc.type = 'triangle'
     osc.frequency.setValueAtTime(150, now)
     osc.frequency.exponentialRampToValueAtTime(40, now + 0.04)
-
     oscGain.gain.setValueAtTime(0.12, now)
     oscGain.gain.exponentialRampToValueAtTime(0.001, now + 0.04)
-
     osc.connect(oscGain)
     oscGain.connect(ctx.destination)
-
     noiseSource.start(now)
     osc.start(now)
     osc.stop(now + 0.05)
   }, [])
+
+  const formatDisplay = (val) => {
+    if (val === 'Error' || val === 'Infinity' || val === 'NaN') return val
+    const num = parseFloat(val)
+    if (isNaN(num)) return val
+
+    if (Math.abs(num) >= 1e12 || (Math.abs(num) < 1e-7 && num !== 0)) {
+      const formatted = num.toExponential(7).replace(/e\+?/, 'e')
+      return formatted
+    }
+
+    return new Intl.NumberFormat('en-US', {
+      maximumFractionDigits: 10,
+      useGrouping: true
+    }).format(num)
+  }
 
   const fetchHistory = useCallback(async () => {
     try {
@@ -76,6 +81,15 @@ function App() {
       setHistory(response.data)
     } catch (error) {
       console.error('Error fetching history:', error)
+    }
+  }, [])
+
+  const handleClearHistory = useCallback(async () => {
+    try {
+      await axios.delete(`${API_BASE}/history`)
+      setHistory([])
+    } catch (error) {
+      console.error('Error clearing history:', error)
     }
   }, [])
 
@@ -90,6 +104,7 @@ function App() {
         setIsNewInput(false)
         return num.toString()
       } else {
+        if (prev.replace(/,/g, '').length >= 15) return prev
         return prev === '0' ? num.toString() : prev + num.toString()
       }
     })
@@ -123,8 +138,9 @@ function App() {
       const response = await axios.get(`${API_BASE}/${endpoint}`, { params: { a, b } })
       const result = response.data.result
       setDisplay(result.toString())
-      setOperation(`${a} ${op} ${b} =`)
+      setOperation(`${formatDisplay(a)} ${op} ${formatDisplay(b)} =`)
       setPreviousValue(result)
+      setAns(result)
       setCurrentOperator(null)
       setIsNewInput(true)
       fetchHistory()
@@ -136,35 +152,22 @@ function App() {
 
   const handleOperator = useCallback((op) => {
     playClick()
-    const currentValue = parseFloat(display)
+    const currentValue = parseFloat(display.replace(/,/g, ''))
     if (previousValue !== null && !isNewInput) {
       calculate(previousValue, currentValue, currentOperator)
     } else {
       setPreviousValue(currentValue)
     }
     setCurrentOperator(op)
-    setOperation(`${display} ${op}`)
+    setOperation(`${formatDisplay(currentValue)} ${op}`)
     setIsNewInput(true)
   }, [display, previousValue, isNewInput, currentOperator, calculate, playClick])
 
   const handleEquals = useCallback(() => {
     playClick()
     if (currentOperator === null || isNewInput) return
-    calculate(previousValue, parseFloat(display), currentOperator)
+    calculate(previousValue, parseFloat(display.replace(/,/g, '')), currentOperator)
   }, [currentOperator, isNewInput, previousValue, display, calculate, playClick])
-
-  const handleDelete = useCallback(() => {
-    playClick()
-    setDisplay(prev => {
-      if (isNewInput) return prev
-      if (prev.length === 1) {
-        setIsNewInput(true)
-        return '0'
-      } else {
-        return prev.slice(0, -1)
-      }
-    })
-  }, [isNewInput, playClick])
 
   const handleClear = useCallback(() => {
     playClick()
@@ -177,10 +180,10 @@ function App() {
 
   const handleScientific = useCallback(async (func) => {
     playClick()
-    const n = parseFloat(display)
+    const n = parseFloat(display.replace(/,/g, ''))
     let endpoint = ''
     switch (func) {
-      case 'sin': endpoint = `sin/${n}`; break;
+      case 'sin': endpoint = `sin/${n}`; break; // Backend handles deg-to-rad
       case 'cos': endpoint = `cos/${n}`; break;
       case 'n!': endpoint = `factorial/${n}`; break;
       default: return;
@@ -190,7 +193,8 @@ function App() {
       const response = await axios.get(`${API_BASE}/${endpoint}`)
       const result = response.data.result
       setDisplay(result.toString())
-      setOperation(`${func}(${n}) =`)
+      setOperation(`${func}(${formatDisplay(n)}) =`)
+      setAns(result)
       setIsNewInput(true)
       fetchHistory()
     } catch (error) {
@@ -199,13 +203,25 @@ function App() {
     }
   }, [display, fetchHistory, playClick])
 
+  const handleConstant = (type) => {
+    playClick()
+    const val = type === 'pi' ? Math.PI : Math.E
+    setDisplay(val.toString())
+    setIsNewInput(true)
+  }
+
+  const handleAns = () => {
+    playClick()
+    setDisplay(ans.toString())
+    setIsNewInput(false)
+  }
+
   useEffect(() => {
     const handleKeyDown = (e) => {
       initAudio()
       let key = e.key
       if (key === 'Enter') key = '='
       if (key.toLowerCase() === 'c' || key === 'Escape') key = 'clear'
-      if (key === 'Backspace') key = 'delete'
 
       setActiveKey(key)
       setTimeout(() => setActiveKey(null), 100)
@@ -219,8 +235,6 @@ function App() {
       } else if (e.key === 'Enter' || e.key === '=') {
         e.preventDefault()
         handleEquals()
-      } else if (e.key === 'Backspace') {
-        handleDelete()
       } else if (e.key === 'Escape' || e.key.toLowerCase() === 'c') {
         handleClear()
       }
@@ -228,93 +242,158 @@ function App() {
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [handleNumber, handleDecimal, handleOperator, handleEquals, handleDelete, handleClear])
+  }, [handleNumber, handleDecimal, handleOperator, handleEquals, handleClear])
 
-  const getButtonClass = (key, baseClass) => {
+  const getButtonClass = (key, type = 'number', custom = '') => {
     const isActive = activeKey === key
-    return `${baseClass} ${isActive ? 'scale-95 brightness-125' : ''}`
+    const base = "flex items-center justify-center rounded-full text-[14px] font-medium transition-all duration-75 select-none h-9 mb-1"
+
+    let colors = ""
+    switch (type) {
+      case 'number':
+        colors = "bg-[#3c4043] text-[#e8eaed] hover:bg-[#4a4e52] active:bg-[#5f6368]"
+        break
+      case 'operator':
+        colors = "bg-[#3c4043] text-[#9aa0a6] hover:bg-[#4a4e52] active:bg-[#5f6368]"
+        break
+      case 'blue':
+        colors = "bg-[#8ab4f8] text-[#202124] hover:bg-[#aecbfa] active:bg-[#c2e7ff] text-xl"
+        break
+      case 'active-toggle':
+        colors = "text-[#e8eaed]"
+        break
+      case 'inactive-toggle':
+        colors = "text-[#9aa0a6] hover:text-[#bdc1c6]"
+        break
+      default:
+        colors = "bg-[#3c4043] text-[#e8eaed]"
+    }
+
+    return `${base} ${colors} ${isActive ? 'brightness-125 scale-95' : ''} ${custom}`
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-slate-900 p-4 font-inter text-slate-100" onClick={initAudio}>
-      <div className="bg-slate-800 p-8 rounded-[2rem] shadow-2xl border border-slate-700 w-full max-w-sm flex flex-col gap-6 relative overflow-hidden">
-        <div className="absolute -top-24 -left-24 w-48 h-48 bg-blue-500/10 blur-[100px] pointer-events-none"></div>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-[#202124] p-4 text-[#e8eaed] font-sans" onClick={initAudio}>
+      <div className="w-full max-w-[800px] bg-[#202124]">
 
-        <div className="bg-slate-950 p-6 rounded-2xl border border-slate-900 shadow-inner flex flex-col justify-end items-end min-h-[120px] gap-1 overflow-hidden">
-          <div className="text-slate-500 text-sm font-mono tracking-wider h-6 overflow-hidden text-ellipsis whitespace-nowrap">
+        {/* Display Container (Pixel-Perfect Google) */}
+        <div className="mb-6 p-4 rounded-3xl border border-[#3c4043] flex flex-col items-end relative min-h-[140px] justify-center bg-[#202124]">
+          <div
+            className="absolute left-6 top-6 opacity-60 cursor-pointer hover:opacity-100 transition-opacity"
+            onClick={() => { playClick(); setIsHistoryOpen(!isHistoryOpen); }}
+            title="Toggle History"
+          >
+            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z" /></svg>
+          </div>
+          <div className="text-[#9aa0a6] text-xl mb-1 tracking-tight h-8 truncate pr-2">
             {operation}
           </div>
-          <div className="text-5xl font-bold font-mono text-blue-400 drop-shadow-[0_0_15px_rgba(96,165,250,0.3)] overflow-hidden text-ellipsis">
-            {display}
+          <div className="text-6xl font-light tracking-tight pr-2">
+            {isNewInput ? formatDisplay(display) : display}
           </div>
-        </div>
 
-        <div className="grid grid-cols-4 gap-3">
-          {['sin', 'cos', 'n!', '^'].map((func) => (
-            <button
-              key={func}
-              onClick={() => func === '^' ? handleOperator('^') : handleScientific(func)}
-              className={getButtonClass(func === '^' ? '^' : func, "bg-slate-700 hover:bg-slate-600 active:scale-95 transition-all p-3 rounded-xl text-xs font-semibold text-slate-400 hover:text-slate-200 border border-slate-600/50")}
-            >
-              {func === '^' ? <span>x<sup>y</sup></span> : func}
-            </button>
-          ))}
-        </div>
-
-        <div className="grid grid-cols-4 gap-4">
-          <button onClick={handleClear} className={getButtonClass('clear', "bg-red-500/20 hover:bg-red-500/30 text-red-500 font-bold p-4 rounded-2xl border border-red-500/30 active:scale-95 transition-all")}>C</button>
-          <button onClick={handleDelete} className={getButtonClass('delete', "bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold p-4 rounded-2xl border border-slate-600 active:scale-95 transition-all")}>DEL</button>
-          <button onClick={() => { playClick(); setDisplay((parseFloat(display) / 100).toString()); }} className="bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold p-4 rounded-2xl border border-slate-600 active:scale-95 transition-all">%</button>
-          <button onClick={() => handleOperator('/')} className={getButtonClass('/', "bg-amber-500 hover:bg-amber-400 text-white font-bold p-4 rounded-2xl shadow-lg shadow-amber-500/20 active:scale-95 transition-all text-2xl")}>÷</button>
-
-          {[7, 8, 9].map(n => (
-            <button key={n} onClick={() => handleNumber(n)} className={getButtonClass(n.toString(), "bg-slate-800 hover:bg-slate-700 text-slate-100 font-semibold p-4 rounded-2xl border border-slate-700 shadow-sm active:scale-95 transition-all text-xl")}>{n}</button>
-          ))}
-          <button onClick={() => handleOperator('*')} className={getButtonClass('*', "bg-amber-500 hover:bg-amber-400 text-white font-bold p-4 rounded-2xl shadow-lg shadow-amber-500/20 active:scale-95 transition-all text-2xl")}>×</button>
-
-          {[4, 5, 6].map(n => (
-            <button key={n} onClick={() => handleNumber(n)} className={getButtonClass(n.toString(), "bg-slate-800 hover:bg-slate-700 text-slate-100 font-semibold p-4 rounded-2xl border border-slate-700 shadow-sm active:scale-95 transition-all text-xl")}>{n}</button>
-          ))}
-          <button onClick={() => handleOperator('-')} className={getButtonClass('-', "bg-amber-500 hover:bg-amber-400 text-white font-bold p-4 rounded-2xl shadow-lg shadow-amber-500/20 active:scale-95 transition-all text-2xl")}>−</button>
-
-          {[1, 2, 3].map(n => (
-            <button key={n} onClick={() => handleNumber(n)} className={getButtonClass(n.toString(), "bg-slate-800 hover:bg-slate-700 text-slate-100 font-semibold p-4 rounded-2xl border border-slate-700 shadow-sm active:scale-95 transition-all text-xl")}>{n}</button>
-          ))}
-          <button onClick={() => handleOperator('+')} className={getButtonClass('+', "bg-amber-500 hover:bg-amber-400 text-white font-bold p-4 rounded-2xl shadow-lg shadow-amber-500/20 active:scale-95 transition-all text-2xl")}>+</button>
-
-          <button onClick={() => handleNumber(0)} className={getButtonClass('0', "bg-slate-800 hover:bg-slate-700 text-slate-100 font-semibold p-4 rounded-2xl border border-slate-700 shadow-sm active:scale-95 transition-all text-xl")}>0</button>
-          <button onClick={handleDecimal} className={getButtonClass('.', "bg-slate-800 hover:bg-slate-700 text-slate-100 font-semibold p-4 rounded-2xl border border-slate-700 shadow-sm active:scale-95 transition-all text-xl")}>.</button>
-          <button onClick={() => { playClick(); setDisplay((parseFloat(display) * -1).toString()); }} className="bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold p-4 rounded-2xl border border-slate-600 active:scale-95 transition-all text-sm">+/-</button>
-          <button onClick={handleEquals} className={getButtonClass('=', "bg-blue-600 hover:bg-blue-500 text-white font-bold p-4 rounded-2xl shadow-lg shadow-blue-600/20 active:scale-95 transition-all text-2xl")}>=</button>
-        </div>
-
-        {history.length > 0 && (
-          <div className="mt-4 bg-slate-950/50 p-4 rounded-2xl border border-slate-800/50 backdrop-blur-sm max-h-32 overflow-y-auto custom-scrollbar">
-            <div className="text-slate-500 text-xs font-bold uppercase tracking-widest mb-3 flex items-center gap-2">
-              <span className="w-1 h-1 bg-blue-500 rounded-full"></span>
-              Recent History
-            </div>
-            <div className="flex flex-col gap-2">
-              {history.slice(-4).reverse().map((item, index) => (
-                <div key={index} className="flex justify-between items-center text-xs group">
-                  <span className="text-slate-500 group-hover:text-slate-400 transition-colors uppercase">{item.Operation}</span>
-                  <span className="text-blue-400 font-bold font-mono">{item.Outcome ?? item.Result ?? item.outcome}</span>
+          {/* History Overlay */}
+          {isHistoryOpen && (
+            <div className="absolute inset-0 bg-[#202124] rounded-3xl z-10 p-4 border border-[#8ab4f8] shadow-2xl flex flex-col">
+              <div className="flex justify-between items-center mb-4 border-b border-[#3c4043] pb-2">
+                <h3 className="text-sm font-medium uppercase tracking-widest text-[#8ab4f8]">History</h3>
+                <div className="flex gap-4">
+                  <button
+                    onClick={handleClearHistory}
+                    className="text-[10px] text-[#9aa0a6] hover:text-[#f28b82] transition-colors uppercase tracking-widest"
+                  >
+                    Clear
+                  </button>
+                  <button
+                    onClick={() => setIsHistoryOpen(false)}
+                    className="text-[#9aa0a6] hover:text-[#e8eaed]"
+                  >
+                    ✕
+                  </button>
                 </div>
-              ))}
+              </div>
+              <div className="flex-1 overflow-y-auto space-y-4 pr-2 scrollbar-thin scrollbar-thumb-[#3c4043] scrollbar-track-transparent">
+                {history.length > 0 ? (
+                  [...history].reverse().map((item, idx) => (
+                    <div key={idx} className="flex flex-col items-end animate-in fade-in slide-in-from-top-2 duration-300">
+                      <span className="text-xs text-[#9aa0a6] mb-1">
+                        {item.Operation}
+                        {item.Operands && ` (${item.Operands.join(', ')})`}
+                      </span>
+                      <span className="text-xl font-light text-[#e8eaed]">
+                        = {formatDisplay(item.Result || item.Outcome || item.outcome)}
+                      </span>
+                    </div>
+                  ))
+                ) : (
+                  <div className="h-full flex items-center justify-center text-[#5f6368] text-sm italic">
+                    No history yet
+                  </div>
+                )}
+              </div>
             </div>
+          )}
+        </div>
+
+        {/* 7-Column Grid (Identical to Image) */}
+        <div className="grid grid-cols-7 gap-x-2 gap-y-2">
+
+          {/* Row 1 */}
+          <div className="flex items-center justify-center col-span-1 h-9">
+            <button onClick={() => { playClick(); setIsDeg(true); }} className={`text-xs ${isDeg ? 'text-[#e8eaed]' : 'text-[#9aa0a6]'}`}>Deg</button>
+            <span className="mx-2 text-[#5f6368]">|</span>
+            <button onClick={() => { playClick(); setIsDeg(false); }} className={`text-xs ${!isDeg ? 'text-[#e8eaed]' : 'text-[#9aa0a6]'}`}>Rad</button>
           </div>
-        )}
+          <button onClick={() => handleScientific('n!')} className={getButtonClass('x!', 'operator')}>x!</button>
+          <button onClick={() => playClick()} className={getButtonClass('(', 'operator')}>(</button>
+          <button onClick={() => playClick()} className={getButtonClass(')', 'operator')}>)</button>
+          <button onClick={() => playClick()} className={getButtonClass('%', 'operator')}>%</button>
+          <button onClick={handleClear} className={getButtonClass('clear', 'operator')}>AC</button>
+          <div className="h-9"></div> {/* Empty place for alignment if needed */}
+
+          {/* Row 2 */}
+          <button onClick={() => playClick()} className={getButtonClass('Inv', 'operator')}>Inv</button>
+          <button onClick={() => handleScientific('sin')} className={getButtonClass('sin', 'operator')}>sin</button>
+          <button onClick={() => playClick()} className={getButtonClass('ln', 'operator')}>ln</button>
+          <button onClick={() => handleNumber(7)} className={getButtonClass('7', 'number')}>7</button>
+          <button onClick={() => handleNumber(8)} className={getButtonClass('8', 'number')}>8</button>
+          <button onClick={() => handleNumber(9)} className={getButtonClass('9', 'number')}>9</button>
+          <button onClick={() => handleOperator('/')} className={getButtonClass('/', 'operator') + " text-xl"}>÷</button>
+
+          {/* Row 3 */}
+          <button onClick={() => handleConstant('pi')} className={getButtonClass('pi', 'operator')}>π</button>
+          <button onClick={() => handleScientific('cos')} className={getButtonClass('cos', 'operator')}>cos</button>
+          <button onClick={() => playClick()} className={getButtonClass('log', 'operator')}>log</button>
+          <button onClick={() => handleNumber(4)} className={getButtonClass('4', 'number')}>4</button>
+          <button onClick={() => handleNumber(5)} className={getButtonClass('5', 'number')}>5</button>
+          <button onClick={() => handleNumber(6)} className={getButtonClass('6', 'number')}>6</button>
+          <button onClick={() => handleOperator('*')} className={getButtonClass('*', 'operator') + " text-xl"}>×</button>
+
+          {/* Row 4 */}
+          <button onClick={() => handleConstant('e')} className={getButtonClass('e', 'operator')}>e</button>
+          <button onClick={() => playClick()} className={getButtonClass('tan', 'operator')}>tan</button>
+          <button onClick={() => playClick()} className={getButtonClass('sqrt', 'operator')}>√</button>
+          <button onClick={() => handleNumber(1)} className={getButtonClass('1', 'number')}>1</button>
+          <button onClick={() => handleNumber(2)} className={getButtonClass('2', 'number')}>2</button>
+          <button onClick={() => handleNumber(3)} className={getButtonClass('3', 'number')}>3</button>
+          <button onClick={() => handleOperator('-')} className={getButtonClass('-', 'operator') + " text-2xl"}>−</button>
+
+          {/* Row 5 */}
+          <button onClick={handleAns} className={getButtonClass('Ans', 'operator')}>Ans</button>
+          <button onClick={() => playClick()} className={getButtonClass('EXP', 'operator')}>EXP</button>
+          <button onClick={() => handleOperator('^')} className={getButtonClass('xy', 'operator')}>x<sup>y</sup></button>
+          <button onClick={() => handleNumber(0)} className={getButtonClass('0', 'number')}>0</button>
+          <button onClick={handleDecimal} className={getButtonClass('.', 'number')}>.</button>
+          <button onClick={handleEquals} className={getButtonClass('=', 'blue')}>=</button>
+          <button onClick={() => handleOperator('+')} className={getButtonClass('+', 'operator') + " text-xl"}>+</button>
+
+        </div>
       </div>
 
-      <div className="mt-8 text-slate-500 text-xs font-medium flex flex-col items-center gap-3">
-        <div className="flex items-center gap-2 bg-slate-800/50 px-3 py-1.5 rounded-full border border-slate-700/50">
-          <kbd className="bg-slate-700 px-1.5 py-0.5 rounded border border-slate-600 text-slate-300">Keyboard Support</kbd>
-          <span>Numbers, Operators, Backspace, Enter</span>
-        </div>
-        <div className="flex items-center gap-2 text-blue-400/60">
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg>
-          <span className="text-[10px] uppercase font-bold tracking-tighter">Synthesized Audio Feedback Enabled</span>
-        </div>
+      <div className="mt-8 flex items-center gap-2 text-[10px] text-[#9aa0a6] uppercase tracking-[0.2em] opacity-30 select-none">
+        <span>Google Standard Replica</span>
+        <span className="w-1 h-1 bg-[#5f6368] rounded-full"></span>
+        <span>Keyboard Active</span>
       </div>
     </div>
   )

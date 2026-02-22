@@ -8,7 +8,7 @@ router.get("/", validateNums, (req, res) => {
   const { a, b } = req.numbers;
   const result = Math.pow(a, b);
 
-  addHistory({ Operation: "Power", Operands: [a, b], outcome: result });
+  addHistory({ Operation: "Power", Operands: [a, b], Result: result });
   res.json({ result });
 });
 
@@ -16,7 +16,7 @@ router.post("/", validateNums, (req, res) => {
   const { a, b } = req.numbers;
   const result = Math.pow(a, b);
 
-  addHistory({ Operation: "Power", Operands: [a, b], outcome: result });
+  addHistory({ Operation: "Power", Operands: [a, b], Result: result });
   res.json({ result });
 });
 

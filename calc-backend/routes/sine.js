@@ -12,7 +12,7 @@ router.get("/:n", (req, res) => {
 
   let result = Number(Math.sin(radians).toFixed(2));
 
-  addHistory({ Operation: "Sine", Operand: n, Outcome: result });
+  addHistory({ Operation: "Sine", Operands: [n], Result: result });
   res.json({ result });
 });
 
@@ -25,7 +25,7 @@ router.post("/:n", (req, res) => {
 
   let result = Number(Math.sin(radians).toFixed(2));
 
-  addHistory({ Operation: "Sine", Operand: n, Outcome: result });
+  addHistory({ Operation: "Sine", Operands: [n], Result: result });
   res.json({ result });
 });
 

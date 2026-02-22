@@ -8,7 +8,7 @@ router.get("/", validateNums, (req, res) => {
   const { a, b } = req.numbers;
   if (b === 0) return res.json({ error: "The divisor can't be zero" });
   const result = a / b;
-  addHistory({ Operation: "Division", Operands: [a, b], Outcome: result });
+  addHistory({ Operation: "Division", Operands: [a, b], Result: result });
   res.json({ result });
 });
 
@@ -16,7 +16,7 @@ router.post("/", validateNums, (req, res) => {
   const { a, b } = req.numbers;
   if (b === 0) return res.json({ error: "The divisor can't be zero" });
   const result = a / b;
-  addHistory({ Operation: "Division", Operands: [a, b], Outcome: result });
+  addHistory({ Operation: "Division", Operands: [a, b], Result: result });
   res.json({ result });
 });
 
