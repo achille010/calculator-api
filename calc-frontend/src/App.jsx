@@ -182,9 +182,11 @@ function App() {
     playClick()
     const n = parseFloat(display.replace(/,/g, ''))
     let endpoint = ''
+    const unit = isDeg ? 'deg' : 'rad'
     switch (func) {
-      case 'sin': endpoint = `sin/${n}`; break; // Backend handles deg-to-rad
-      case 'cos': endpoint = `cos/${n}`; break;
+      case 'sin': endpoint = `sin/${n}?unit=${unit}`; break;
+      case 'cos': endpoint = `cos/${n}?unit=${unit}`; break;
+      case 'tan': endpoint = `tan/${n}?unit=${unit}`; break;
       case 'n!': endpoint = `factorial/${n}`; break;
       default: return;
     }
@@ -319,6 +321,7 @@ function App() {
                       <span className="text-xs text-[#9aa0a6] mb-1">
                         {item.Operation}
                         {item.Operands && ` (${item.Operands.join(', ')})`}
+                        {item.Unit && <span className="ml-1 opacity-70">[{item.Unit}]</span>}
                       </span>
                       <span className="text-xl font-light text-[#e8eaed]">
                         = {formatDisplay(item.Result || item.Outcome || item.outcome)}
@@ -352,9 +355,9 @@ function App() {
           <div className="h-9"></div> {/* Empty place for alignment if needed */}
 
           {/* Row 2 */}
-          <button onClick={() => playClick()} className={getButtonClass('Inv', 'operator')}>Inv</button>
+          <button onClick={() => playClick()} className={getButtonClass('Inv', 'operator') + " opacity-50 cursor-not-allowed"} title="Coming Soon">Inv</button>
           <button onClick={() => handleScientific('sin')} className={getButtonClass('sin', 'operator')}>sin</button>
-          <button onClick={() => playClick()} className={getButtonClass('ln', 'operator')}>ln</button>
+          <button onClick={() => playClick()} className={getButtonClass('ln', 'operator') + " opacity-50 cursor-not-allowed"} title="Coming Soon">ln</button>
           <button onClick={() => handleNumber(7)} className={getButtonClass('7', 'number')}>7</button>
           <button onClick={() => handleNumber(8)} className={getButtonClass('8', 'number')}>8</button>
           <button onClick={() => handleNumber(9)} className={getButtonClass('9', 'number')}>9</button>
@@ -363,7 +366,7 @@ function App() {
           {/* Row 3 */}
           <button onClick={() => handleConstant('pi')} className={getButtonClass('pi', 'operator')}>π</button>
           <button onClick={() => handleScientific('cos')} className={getButtonClass('cos', 'operator')}>cos</button>
-          <button onClick={() => playClick()} className={getButtonClass('log', 'operator')}>log</button>
+          <button onClick={() => playClick()} className={getButtonClass('log', 'operator') + " opacity-50 cursor-not-allowed"} title="Coming Soon">log</button>
           <button onClick={() => handleNumber(4)} className={getButtonClass('4', 'number')}>4</button>
           <button onClick={() => handleNumber(5)} className={getButtonClass('5', 'number')}>5</button>
           <button onClick={() => handleNumber(6)} className={getButtonClass('6', 'number')}>6</button>
@@ -371,8 +374,8 @@ function App() {
 
           {/* Row 4 */}
           <button onClick={() => handleConstant('e')} className={getButtonClass('e', 'operator')}>e</button>
-          <button onClick={() => playClick()} className={getButtonClass('tan', 'operator')}>tan</button>
-          <button onClick={() => playClick()} className={getButtonClass('sqrt', 'operator')}>√</button>
+          <button onClick={() => handleScientific('tan')} className={getButtonClass('tan', 'operator')}>tan</button>
+          <button onClick={() => playClick()} className={getButtonClass('sqrt', 'operator') + " opacity-50 cursor-not-allowed"} title="Coming Soon">√</button>
           <button onClick={() => handleNumber(1)} className={getButtonClass('1', 'number')}>1</button>
           <button onClick={() => handleNumber(2)} className={getButtonClass('2', 'number')}>2</button>
           <button onClick={() => handleNumber(3)} className={getButtonClass('3', 'number')}>3</button>
