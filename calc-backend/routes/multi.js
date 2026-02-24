@@ -10,7 +10,7 @@ router.get("/", validateNums, (req, res) => {
   addHistory({
     Operation: "Multiplication",
     Operands: [a, b],
-    Outcome: result,
+    Result: result,
   });
   res.json({ result });
 });
@@ -21,7 +21,7 @@ router.post("/", validateNums, (req, res) => {
   addHistory({
     Operation: "Multiplication",
     Operands: [a, b],
-    Outcome: result,
+    Result: result,
   });
   res.json({ result });
 });

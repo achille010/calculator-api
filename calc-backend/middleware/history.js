@@ -12,3 +12,7 @@ export const addHistory = (entry) => {
 export const getHistory = () => {
   return history;
 };
+
+export const clearHistory = () => {
+  history.length = 0;
+};

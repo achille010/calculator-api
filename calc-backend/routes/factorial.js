@@ -21,7 +21,7 @@ router.get("/:n", (req, res) => {
     return res.status(400).json({ error: "Not a number, Less than one or not an integer" });
   }
   const result = factorial(n);
-  addHistory({ Operation: "Factorial", Operand: n, outcome: result });
+  addHistory({ Operation: "Factorial", Operands: [n], Result: result });
   res.json({ result });
 });
 
