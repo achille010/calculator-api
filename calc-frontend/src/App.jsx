@@ -188,6 +188,7 @@ function App() {
       case 'cos': endpoint = `cos/${n}?unit=${unit}`; break;
       case 'tan': endpoint = `tan/${n}?unit=${unit}`; break;
       case 'n!': endpoint = `factorial/${n}`; break;
+      case 'sqrt': endpoint = `sqrt/${n}`; break;
       default: return;
     }
 
@@ -375,7 +376,7 @@ function App() {
           {/* Row 4 */}
           <button onClick={() => handleConstant('e')} className={getButtonClass('e', 'operator')}>e</button>
           <button onClick={() => handleScientific('tan')} className={getButtonClass('tan', 'operator')}>tan</button>
-          <button onClick={() => playClick()} className={getButtonClass('sqrt', 'operator') + " opacity-50 cursor-not-allowed"} title="Coming Soon">√</button>
+          <button onClick={() => handleScientific('sqrt')} className={getButtonClass('sqrt', 'operator')}>√</button>
           <button onClick={() => handleNumber(1)} className={getButtonClass('1', 'number')}>1</button>
           <button onClick={() => handleNumber(2)} className={getButtonClass('2', 'number')}>2</button>
           <button onClick={() => handleNumber(3)} className={getButtonClass('3', 'number')}>3</button>
