@@ -11,6 +11,9 @@ import summarray from "./routes/summarray.js";
 import sine from "./routes/sine.js";
 import cosine from "./routes/cosine.js";
 import tangent from "./routes/tangent.js";
+import squareRoot from "./routes/squareRoot.js";
+import ln from "./routes/natLog.js";
+import log10 from "./routes/log10.js";
 
 import { logger } from "./middleware/logger.js";
 import { controlAccess } from "./middleware/access.js";
@@ -33,6 +36,9 @@ export const serverOn = (port = 3000) => {
   app.use("/sin", sine);
   app.use("/cos", cosine);
   app.use("/tan", tangent);
+  app.use("/sqrt", squareRoot);
+  app.use("/ln", ln);
+  app.use("/log", log10);
 
   app.get("/", (req, res) => {
     res.send(`

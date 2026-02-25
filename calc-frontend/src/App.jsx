@@ -123,6 +123,15 @@ function App() {
     })
   }, [isNewInput, playClick])
 
+  const handleBackspace = useCallback(() => {
+    playClick()
+    setDisplay(prev => {
+      if (isNewInput || prev === '0' || prev === 'Error') return '0'
+      const newVal = prev.slice(0, -1)
+      return newVal === '' || newVal === '-' ? '0' : newVal
+    })
+  }, [isNewInput, playClick])
+
   const calculate = useCallback(async (a, b, op) => {
     let endpoint = ''
     switch (op) {
@@ -188,6 +197,9 @@ function App() {
       case 'cos': endpoint = `cos/${n}?unit=${unit}`; break;
       case 'tan': endpoint = `tan/${n}?unit=${unit}`; break;
       case 'n!': endpoint = `factorial/${n}`; break;
+      case 'sqrt': endpoint = `sqrt/${n}`; break;
+      case 'ln': endpoint = `ln/${n}`; break;
+      case 'log': endpoint = `log/${n}`; break;
       default: return;
     }
 
@@ -239,12 +251,14 @@ function App() {
         handleEquals()
       } else if (e.key === 'Escape' || e.key.toLowerCase() === 'c') {
         handleClear()
+      } else if (e.key === 'Backspace') {
+        handleBackspace()
       }
     }
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [handleNumber, handleDecimal, handleOperator, handleEquals, handleClear])
+  }, [handleNumber, handleDecimal, handleOperator, handleEquals, handleClear, handleBackspace])
 
   const getButtonClass = (key, type = 'number', custom = '') => {
     const isActive = activeKey === key
@@ -256,10 +270,10 @@ function App() {
         colors = "bg-[#3c4043] text-[#e8eaed] hover:bg-[#4a4e52] active:bg-[#5f6368]"
         break
       case 'operator':
-        colors = "bg-[#3c4043] text-[#9aa0a6] hover:bg-[#4a4e52] active:bg-[#5f6368]"
+        colors = "bg-[#2C303D] text-[#9aa0a6] hover:bg-[#3d4253] active:bg-[#4d5368]"
         break
       case 'blue':
-        colors = "bg-[#8ab4f8] text-[#202124] hover:bg-[#aecbfa] active:bg-[#c2e7ff] text-xl"
+        colors = "bg-[#2C303D] text-[#8ab4f8] hover:bg-[#3d4253] active:bg-[#4d5368] text-xl"
         break
       case 'active-toggle':
         colors = "text-[#e8eaed]"
@@ -268,7 +282,7 @@ function App() {
         colors = "text-[#9aa0a6] hover:text-[#bdc1c6]"
         break
       default:
-        colors = "bg-[#3c4043] text-[#e8eaed]"
+        colors = "bg-[#2C303D] text-[#e8eaed]"
     }
 
     return `${base} ${colors} ${isActive ? 'brightness-125 scale-95' : ''} ${custom}`
@@ -278,14 +292,14 @@ function App() {
     <div className="flex flex-col items-center justify-center min-h-screen bg-[#202124] p-4 text-[#e8eaed] font-sans" onClick={initAudio}>
       <div className="w-full max-w-[800px] bg-[#202124]">
 
-        {/* Display Container (Pixel-Perfect Google) */}
         <div className="mb-6 p-4 rounded-3xl border border-[#3c4043] flex flex-col items-end relative min-h-[140px] justify-center bg-[#202124]">
           <div
             className="absolute left-6 top-6 opacity-60 cursor-pointer hover:opacity-100 transition-opacity"
             onClick={() => { playClick(); setIsHistoryOpen(!isHistoryOpen); }}
             title="Toggle History"
+            style={{ cursor: 'pointer' }}
           >
-            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z" /></svg>
+            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" style={{ cursor: 'pointer' }}><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z" /></svg>
           </div>
           <div className="text-[#9aa0a6] text-xl mb-1 tracking-tight h-8 truncate pr-2">
             {operation}
@@ -294,7 +308,6 @@ function App() {
             {isNewInput ? formatDisplay(display) : display}
           </div>
 
-          {/* History Overlay */}
           {isHistoryOpen && (
             <div className="absolute inset-0 bg-[#202124] rounded-3xl z-10 p-4 border border-[#8ab4f8] shadow-2xl flex flex-col">
               <div className="flex justify-between items-center mb-4 border-b border-[#3c4043] pb-2">
@@ -303,12 +316,14 @@ function App() {
                   <button
                     onClick={handleClearHistory}
                     className="text-[10px] text-[#9aa0a6] hover:text-[#f28b82] transition-colors uppercase tracking-widest"
+                    style={{ cursor: 'pointer' }}
                   >
                     Clear
                   </button>
                   <button
                     onClick={() => setIsHistoryOpen(false)}
                     className="text-[#9aa0a6] hover:text-[#e8eaed]"
+                    style={{ cursor: 'pointer' }}
                   >
                     ✕
                   </button>
@@ -338,10 +353,8 @@ function App() {
           )}
         </div>
 
-        {/* 7-Column Grid (Identical to Image) */}
         <div className="grid grid-cols-7 gap-x-2 gap-y-2">
 
-          {/* Row 1 */}
           <div className="flex items-center justify-center col-span-1 h-9">
             <button onClick={() => { playClick(); setIsDeg(true); }} className={`text-xs ${isDeg ? 'text-[#e8eaed]' : 'text-[#9aa0a6]'}`}>Deg</button>
             <span className="mx-2 text-[#5f6368]">|</span>
@@ -352,36 +365,32 @@ function App() {
           <button onClick={() => playClick()} className={getButtonClass(')', 'operator')}>)</button>
           <button onClick={() => playClick()} className={getButtonClass('%', 'operator')}>%</button>
           <button onClick={handleClear} className={getButtonClass('clear', 'operator')}>AC</button>
-          <div className="h-9"></div> {/* Empty place for alignment if needed */}
+          <div className="h-9"></div>
 
-          {/* Row 2 */}
           <button onClick={() => playClick()} className={getButtonClass('Inv', 'operator') + " opacity-50 cursor-not-allowed"} title="Coming Soon">Inv</button>
           <button onClick={() => handleScientific('sin')} className={getButtonClass('sin', 'operator')}>sin</button>
-          <button onClick={() => playClick()} className={getButtonClass('ln', 'operator') + " opacity-50 cursor-not-allowed"} title="Coming Soon">ln</button>
+          <button onClick={() => handleScientific('ln')} className={getButtonClass('ln', 'operator')}>ln</button>
           <button onClick={() => handleNumber(7)} className={getButtonClass('7', 'number')}>7</button>
           <button onClick={() => handleNumber(8)} className={getButtonClass('8', 'number')}>8</button>
           <button onClick={() => handleNumber(9)} className={getButtonClass('9', 'number')}>9</button>
           <button onClick={() => handleOperator('/')} className={getButtonClass('/', 'operator') + " text-xl"}>÷</button>
 
-          {/* Row 3 */}
           <button onClick={() => handleConstant('pi')} className={getButtonClass('pi', 'operator')}>π</button>
           <button onClick={() => handleScientific('cos')} className={getButtonClass('cos', 'operator')}>cos</button>
-          <button onClick={() => playClick()} className={getButtonClass('log', 'operator') + " opacity-50 cursor-not-allowed"} title="Coming Soon">log</button>
+          <button onClick={() => handleScientific('log')} className={getButtonClass('log', 'operator')}>log</button>
           <button onClick={() => handleNumber(4)} className={getButtonClass('4', 'number')}>4</button>
           <button onClick={() => handleNumber(5)} className={getButtonClass('5', 'number')}>5</button>
           <button onClick={() => handleNumber(6)} className={getButtonClass('6', 'number')}>6</button>
           <button onClick={() => handleOperator('*')} className={getButtonClass('*', 'operator') + " text-xl"}>×</button>
 
-          {/* Row 4 */}
           <button onClick={() => handleConstant('e')} className={getButtonClass('e', 'operator')}>e</button>
           <button onClick={() => handleScientific('tan')} className={getButtonClass('tan', 'operator')}>tan</button>
-          <button onClick={() => playClick()} className={getButtonClass('sqrt', 'operator') + " opacity-50 cursor-not-allowed"} title="Coming Soon">√</button>
+          <button onClick={() => handleScientific('sqrt')} className={getButtonClass('sqrt', 'operator')}>√</button>
           <button onClick={() => handleNumber(1)} className={getButtonClass('1', 'number')}>1</button>
           <button onClick={() => handleNumber(2)} className={getButtonClass('2', 'number')}>2</button>
           <button onClick={() => handleNumber(3)} className={getButtonClass('3', 'number')}>3</button>
           <button onClick={() => handleOperator('-')} className={getButtonClass('-', 'operator') + " text-2xl"}>−</button>
 
-          {/* Row 5 */}
           <button onClick={handleAns} className={getButtonClass('Ans', 'operator')}>Ans</button>
           <button onClick={() => playClick()} className={getButtonClass('EXP', 'operator')}>EXP</button>
           <button onClick={() => handleOperator('^')} className={getButtonClass('xy', 'operator')}>x<sup>y</sup></button>
