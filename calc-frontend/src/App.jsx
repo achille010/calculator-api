@@ -198,6 +198,8 @@ function App() {
       case 'tan': endpoint = `tan/${n}?unit=${unit}`; break;
       case 'n!': endpoint = `factorial/${n}`; break;
       case 'sqrt': endpoint = `sqrt/${n}`; break;
+      case 'ln': endpoint = `ln/${n}`; break;
+      case 'log': endpoint = `log/${n}`; break;
       default: return;
     }
 
@@ -271,7 +273,7 @@ function App() {
         colors = "bg-[#2C303D] text-[#9aa0a6] hover:bg-[#3d4253] active:bg-[#4d5368]"
         break
       case 'blue':
-        colors = "bg-[#8ab4f8] text-[#202124] hover:bg-[#aecbfa] active:bg-[#c2e7ff] text-xl"
+        colors = "bg-[#2C303D] text-[#8ab4f8] hover:bg-[#3d4253] active:bg-[#4d5368] text-xl"
         break
       case 'active-toggle':
         colors = "text-[#e8eaed]"
@@ -354,48 +356,48 @@ function App() {
         <div className="grid grid-cols-7 gap-x-2 gap-y-2">
 
           <div className="flex items-center justify-center col-span-1 h-9">
-            <button onClick={() => { playClick(); setIsDeg(true); }} className={`text-xs ${isDeg ? 'text-[#e8eaed]' : 'text-[#9aa0a6]'}`} style={{ cursor: 'pointer' }}>Deg</button>
+            <button onClick={() => { playClick(); setIsDeg(true); }} className={`text-xs ${isDeg ? 'text-[#e8eaed]' : 'text-[#9aa0a6]'}`}>Deg</button>
             <span className="mx-2 text-[#5f6368]">|</span>
-            <button onClick={() => { playClick(); setIsDeg(false); }} className={`text-xs ${!isDeg ? 'text-[#e8eaed]' : 'text-[#9aa0a6]'}`} style={{ cursor: 'pointer' }}>Rad</button>
+            <button onClick={() => { playClick(); setIsDeg(false); }} className={`text-xs ${!isDeg ? 'text-[#e8eaed]' : 'text-[#9aa0a6]'}`}>Rad</button>
           </div>
-          <button onClick={() => handleScientific('n!')} className={getButtonClass('x!', 'operator')} style={{ cursor: 'pointer' }}>x!</button>
-          <button onClick={() => playClick()} className={getButtonClass('(', 'operator')} style={{ cursor: 'pointer' }}>(</button>
-          <button onClick={() => playClick()} className={getButtonClass(')', 'operator')} style={{ cursor: 'pointer' }}>)</button>
-          <button onClick={() => playClick()} className={getButtonClass('%', 'operator')} style={{ cursor: 'pointer' }}>%</button>
-          <button onClick={handleClear} className={getButtonClass('clear', 'operator')} style={{ cursor: 'pointer' }}>AC</button>
+          <button onClick={() => handleScientific('n!')} className={getButtonClass('x!', 'operator')}>x!</button>
+          <button onClick={() => playClick()} className={getButtonClass('(', 'operator')}>(</button>
+          <button onClick={() => playClick()} className={getButtonClass(')', 'operator')}>)</button>
+          <button onClick={() => playClick()} className={getButtonClass('%', 'operator')}>%</button>
+          <button onClick={handleClear} className={getButtonClass('clear', 'operator')}>AC</button>
           <div className="h-9"></div>
 
-          <button onClick={() => playClick()} className={getButtonClass('Inv', 'operator') + " opacity-50 cursor-not-allowed"} title="Coming Soon" style={{ cursor: 'pointer' }}>Inv</button>
-          <button onClick={() => handleScientific('sin')} className={getButtonClass('sin', 'operator')} style={{ cursor: 'pointer' }}>sin</button>
-          <button onClick={() => playClick()} className={getButtonClass('ln', 'operator') + " opacity-50 cursor-not-allowed"} title="Coming Soon" style={{ cursor: 'pointer' }}>ln</button>
-          <button onClick={() => handleNumber(7)} className={getButtonClass('7', 'number')} style={{ cursor: 'pointer' }}>7</button>
-          <button onClick={() => handleNumber(8)} className={getButtonClass('8', 'number')} style={{ cursor: 'pointer' }}>8</button>
-          <button onClick={() => handleNumber(9)} className={getButtonClass('9', 'number')} style={{ cursor: 'pointer' }}>9</button>
-          <button onClick={() => handleOperator('/')} className={getButtonClass('/', 'operator') + " text-xl"} style={{ cursor: 'pointer' }}>÷</button>
+          <button onClick={() => playClick()} className={getButtonClass('Inv', 'operator') + " opacity-50 cursor-not-allowed"} title="Coming Soon">Inv</button>
+          <button onClick={() => handleScientific('sin')} className={getButtonClass('sin', 'operator')}>sin</button>
+          <button onClick={() => handleScientific('ln')} className={getButtonClass('ln', 'operator')}>ln</button>
+          <button onClick={() => handleNumber(7)} className={getButtonClass('7', 'number')}>7</button>
+          <button onClick={() => handleNumber(8)} className={getButtonClass('8', 'number')}>8</button>
+          <button onClick={() => handleNumber(9)} className={getButtonClass('9', 'number')}>9</button>
+          <button onClick={() => handleOperator('/')} className={getButtonClass('/', 'operator') + " text-xl"}>÷</button>
 
-          <button onClick={() => handleConstant('pi')} className={getButtonClass('pi', 'operator')} style={{ cursor: 'pointer' }}>π</button>
-          <button onClick={() => handleScientific('cos')} className={getButtonClass('cos', 'operator')} style={{ cursor: 'pointer' }}>cos</button>
-          <button onClick={() => playClick()} className={getButtonClass('log', 'operator') + " opacity-50 cursor-not-allowed"} title="Coming Soon" style={{ cursor: 'pointer' }}>log</button>
-          <button onClick={() => handleNumber(4)} className={getButtonClass('4', 'number')} style={{ cursor: 'pointer' }}>4</button>
-          <button onClick={() => handleNumber(5)} className={getButtonClass('5', 'number')} style={{ cursor: 'pointer' }}>5</button>
-          <button onClick={() => handleNumber(6)} className={getButtonClass('6', 'number')} style={{ cursor: 'pointer' }}>6</button>
-          <button onClick={() => handleOperator('*')} className={getButtonClass('*', 'operator') + " text-xl"} style={{ cursor: 'pointer' }}>×</button>
+          <button onClick={() => handleConstant('pi')} className={getButtonClass('pi', 'operator')}>π</button>
+          <button onClick={() => handleScientific('cos')} className={getButtonClass('cos', 'operator')}>cos</button>
+          <button onClick={() => handleScientific('log')} className={getButtonClass('log', 'operator')}>log</button>
+          <button onClick={() => handleNumber(4)} className={getButtonClass('4', 'number')}>4</button>
+          <button onClick={() => handleNumber(5)} className={getButtonClass('5', 'number')}>5</button>
+          <button onClick={() => handleNumber(6)} className={getButtonClass('6', 'number')}>6</button>
+          <button onClick={() => handleOperator('*')} className={getButtonClass('*', 'operator') + " text-xl"}>×</button>
 
-          <button onClick={() => handleConstant('e')} className={getButtonClass('e', 'operator')} style={{ cursor: 'pointer' }}>e</button>
-          <button onClick={() => handleScientific('tan')} className={getButtonClass('tan', 'operator')} style={{ cursor: 'pointer' }}>tan</button>
-          <button onClick={() => handleScientific('sqrt')} className={getButtonClass('sqrt', 'operator')} style={{ cursor: 'pointer' }}>√</button>
-          <button onClick={() => handleNumber(1)} className={getButtonClass('1', 'number')} style={{ cursor: 'pointer' }}>1</button>
-          <button onClick={() => handleNumber(2)} className={getButtonClass('2', 'number')} style={{ cursor: 'pointer' }}>2</button>
-          <button onClick={() => handleNumber(3)} className={getButtonClass('3', 'number')} style={{ cursor: 'pointer' }}>3</button>
-          <button onClick={() => handleOperator('-')} className={getButtonClass('-', 'operator') + " text-2xl"} style={{ cursor: 'pointer' }}>−</button>
+          <button onClick={() => handleConstant('e')} className={getButtonClass('e', 'operator')}>e</button>
+          <button onClick={() => handleScientific('tan')} className={getButtonClass('tan', 'operator')}>tan</button>
+          <button onClick={() => handleScientific('sqrt')} className={getButtonClass('sqrt', 'operator')}>√</button>
+          <button onClick={() => handleNumber(1)} className={getButtonClass('1', 'number')}>1</button>
+          <button onClick={() => handleNumber(2)} className={getButtonClass('2', 'number')}>2</button>
+          <button onClick={() => handleNumber(3)} className={getButtonClass('3', 'number')}>3</button>
+          <button onClick={() => handleOperator('-')} className={getButtonClass('-', 'operator') + " text-2xl"}>−</button>
 
-          <button onClick={handleAns} className={getButtonClass('Ans', 'operator')} style={{ cursor: 'pointer' }}>Ans</button>
-          <button onClick={() => playClick()} className={getButtonClass('EXP', 'operator')} style={{ cursor: 'pointer' }}>EXP</button>
-          <button onClick={() => handleOperator('^')} className={getButtonClass('xy', 'operator')} style={{ cursor: 'pointer' }}>x<sup>y</sup></button>
-          <button onClick={() => handleNumber(0)} className={getButtonClass('0', 'number')} style={{ cursor: 'pointer' }}>0</button>
-          <button onClick={handleDecimal} className={getButtonClass('.', 'number')} style={{ cursor: 'pointer' }}>.</button>
-          <button onClick={handleEquals} className={getButtonClass('=', 'blue')} style={{ cursor: 'pointer' }}>=</button>
-          <button onClick={() => handleOperator('+')} className={getButtonClass('+', 'operator') + " text-xl"} style={{ cursor: 'pointer' }}>+</button>
+          <button onClick={handleAns} className={getButtonClass('Ans', 'operator')}>Ans</button>
+          <button onClick={() => playClick()} className={getButtonClass('EXP', 'operator')}>EXP</button>
+          <button onClick={() => handleOperator('^')} className={getButtonClass('xy', 'operator')}>x<sup>y</sup></button>
+          <button onClick={() => handleNumber(0)} className={getButtonClass('0', 'number')}>0</button>
+          <button onClick={handleDecimal} className={getButtonClass('.', 'number')}>.</button>
+          <button onClick={handleEquals} className={getButtonClass('=', 'blue')}>=</button>
+          <button onClick={() => handleOperator('+')} className={getButtonClass('+', 'operator') + " text-xl"}>+</button>
 
         </div>
       </div>
