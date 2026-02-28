@@ -15,6 +15,7 @@ function App() {
   const [isDeg, setIsDeg] = useState(true)
   const [ans, setAns] = useState(0)
   const [isHistoryOpen, setIsHistoryOpen] = useState(false)
+  const [isShift, setIsShift] = useState(false)
 
   const audioContextRef = useRef(null)
 
@@ -173,10 +174,23 @@ function App() {
   }, [display, previousValue, isNewInput, currentOperator, calculate, playClick])
 
   const handleEquals = useCallback(() => {
-    playClick()
-    if (currentOperator === null || isNewInput) return
-    calculate(previousValue, parseFloat(display.replace(/,/g, '')), currentOperator)
-  }, [currentOperator, isNewInput, previousValue, display, calculate, playClick])
+    playClick();
+    const currentValue = parseFloat(display.replace(/,/g, ''));
+
+    if (currentOperator === null) {
+      if (!isNewInput) {
+        setDisplay(currentValue.toString());
+        setOperation(`${formatDisplay(currentValue)} =`);
+        setAns(currentValue);
+        setPreviousValue(currentValue);
+        setIsNewInput(true);
+      }
+      return;
+    }
+
+    if (isNewInput) return;
+    calculate(previousValue, currentValue, currentOperator);
+  }, [currentOperator, isNewInput, previousValue, display, calculate, playClick]);
 
   const handleClear = useCallback(() => {
     playClick()
@@ -200,6 +214,10 @@ function App() {
       case 'sqrt': endpoint = `sqrt/${n}`; break;
       case 'ln': endpoint = `ln/${n}`; break;
       case 'log': endpoint = `log/${n}`; break;
+      case 'inv': endpoint = `inv/${n}`; break;
+      case 'arcsin': endpoint = `arcsin/${n}?unit=${unit}`; break;
+      case 'arccos': endpoint = `arccos/${n}?unit=${unit}`; break;
+      case 'arctan': endpoint = `arctan/${n}?unit=${unit}`; break;
       default: return;
     }
 
@@ -224,11 +242,34 @@ function App() {
     setIsNewInput(true)
   }
 
-  const handleAns = () => {
+  const handleAns = useCallback(() => {
     playClick()
-    setDisplay(ans.toString())
+
+    let ansValue = ans;
+    if (history.length > 0) {
+      const lastEntry = history[history.length - 1];
+      ansValue = lastEntry.Result || lastEntry.Outcome || lastEntry.outcome || ansValue;
+    }
+
+    setDisplay(ansValue.toString())
     setIsNewInput(false)
-  }
+  }, [ans, history, playClick])
+
+  const handleRnd = useCallback(async () => {
+    playClick()
+    try {
+      const response = await axios.get(`${API_BASE}/rnd`)
+      const result = response.data.result
+      setDisplay(result.toString())
+      setOperation('Rnd =')
+      setAns(result)
+      setIsNewInput(true)
+      fetchHistory()
+    } catch (error) {
+      setDisplay('Error')
+      setIsNewInput(true)
+    }
+  }, [fetchHistory, playClick])
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -301,7 +342,10 @@ function App() {
           >
             <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" style={{ cursor: 'pointer' }}><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z" /></svg>
           </div>
-          <div className="text-[#9aa0a6] text-xl mb-1 tracking-tight h-8 truncate pr-2">
+
+
+
+          <div key={operation} className="text-[#9aa0a6] text-xl mb-1 tracking-tight h-8 truncate pr-2 animate-in slide-in-from-bottom-2 fade-in duration-300">
             {operation}
           </div>
           <div className="text-6xl font-light tracking-tight pr-2">
@@ -355,20 +399,34 @@ function App() {
 
         <div className="grid grid-cols-7 gap-x-2 gap-y-2">
 
-          <div className="flex items-center justify-center col-span-1 h-9">
-            <button onClick={() => { playClick(); setIsDeg(true); }} className={`text-xs ${isDeg ? 'text-[#e8eaed]' : 'text-[#9aa0a6]'}`}>Deg</button>
-            <span className="mx-2 text-[#5f6368]">|</span>
-            <button onClick={() => { playClick(); setIsDeg(false); }} className={`text-xs ${!isDeg ? 'text-[#e8eaed]' : 'text-[#9aa0a6]'}`}>Rad</button>
+          <button onClick={() => { playClick(); setIsShift(!isShift); }} className={getButtonClass('shift', 'operator')} title="Shift" style={isShift ? { backgroundColor: '#3d4253' } : {}}>
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+            </svg>
+          </button>
+
+          <div className="flex items-center justify-between col-span-1 h-9 rounded-full overflow-hidden p-0.5">
+            <button
+              onClick={() => { playClick(); setIsDeg(true); }}
+              className={`flex-1 h-full rounded-full transition-colors duration-300 text-xs font-medium ${isDeg ? 'bg-[#2C303D] text-[#e8eaed]' : 'text-[#9aa0a6] hover:bg-[#3d4253] active:bg-[#4d5368]'}`}
+            >
+              Deg
+            </button>
+            <button
+              onClick={() => { playClick(); setIsDeg(false); }}
+              className={`flex-1 h-full rounded-full transition-colors duration-300 text-xs font-medium ${!isDeg ? 'bg-[#2C303D] text-[#e8eaed]' : 'text-[#9aa0a6] hover:bg-[#3d4253] active:bg-[#4d5368]'}`}
+            >
+              Rad
+            </button>
           </div>
           <button onClick={() => handleScientific('n!')} className={getButtonClass('x!', 'operator')}>x!</button>
           <button onClick={() => playClick()} className={getButtonClass('(', 'operator')}>(</button>
           <button onClick={() => playClick()} className={getButtonClass(')', 'operator')}>)</button>
           <button onClick={() => playClick()} className={getButtonClass('%', 'operator')}>%</button>
           <button onClick={handleClear} className={getButtonClass('clear', 'operator')}>AC</button>
-          <div className="h-9"></div>
 
-          <button onClick={() => playClick()} className={getButtonClass('Inv', 'operator') + " opacity-50 cursor-not-allowed"} title="Coming Soon">Inv</button>
-          <button onClick={() => handleScientific('sin')} className={getButtonClass('sin', 'operator')}>sin</button>
+          <button onClick={() => handleScientific('inv')} className={getButtonClass('Inv', 'operator')}>Inv</button>
+          <button onClick={() => handleScientific(isShift ? 'arcsin' : 'sin')} className={getButtonClass('sin', 'operator')} dangerouslySetInnerHTML={{ __html: isShift ? 'sin<sup>-1</sup>' : 'sin' }}></button>
           <button onClick={() => handleScientific('ln')} className={getButtonClass('ln', 'operator')}>ln</button>
           <button onClick={() => handleNumber(7)} className={getButtonClass('7', 'number')}>7</button>
           <button onClick={() => handleNumber(8)} className={getButtonClass('8', 'number')}>8</button>
@@ -376,7 +434,7 @@ function App() {
           <button onClick={() => handleOperator('/')} className={getButtonClass('/', 'operator') + " text-xl"}>÷</button>
 
           <button onClick={() => handleConstant('pi')} className={getButtonClass('pi', 'operator')}>π</button>
-          <button onClick={() => handleScientific('cos')} className={getButtonClass('cos', 'operator')}>cos</button>
+          <button onClick={() => handleScientific(isShift ? 'arccos' : 'cos')} className={getButtonClass('cos', 'operator')} dangerouslySetInnerHTML={{ __html: isShift ? 'cos<sup>-1</sup>' : 'cos' }}></button>
           <button onClick={() => handleScientific('log')} className={getButtonClass('log', 'operator')}>log</button>
           <button onClick={() => handleNumber(4)} className={getButtonClass('4', 'number')}>4</button>
           <button onClick={() => handleNumber(5)} className={getButtonClass('5', 'number')}>5</button>
@@ -384,14 +442,18 @@ function App() {
           <button onClick={() => handleOperator('*')} className={getButtonClass('*', 'operator') + " text-xl"}>×</button>
 
           <button onClick={() => handleConstant('e')} className={getButtonClass('e', 'operator')}>e</button>
-          <button onClick={() => handleScientific('tan')} className={getButtonClass('tan', 'operator')}>tan</button>
+          <button onClick={() => handleScientific(isShift ? 'arctan' : 'tan')} className={getButtonClass('tan', 'operator')} dangerouslySetInnerHTML={{ __html: isShift ? 'tan<sup>-1</sup>' : 'tan' }}></button>
           <button onClick={() => handleScientific('sqrt')} className={getButtonClass('sqrt', 'operator')}>√</button>
           <button onClick={() => handleNumber(1)} className={getButtonClass('1', 'number')}>1</button>
           <button onClick={() => handleNumber(2)} className={getButtonClass('2', 'number')}>2</button>
           <button onClick={() => handleNumber(3)} className={getButtonClass('3', 'number')}>3</button>
           <button onClick={() => handleOperator('-')} className={getButtonClass('-', 'operator') + " text-2xl"}>−</button>
 
-          <button onClick={handleAns} className={getButtonClass('Ans', 'operator')}>Ans</button>
+          {isShift ? (
+            <button onClick={handleRnd} className={getButtonClass('Rnd', 'operator')}>Rnd</button>
+          ) : (
+            <button onClick={handleAns} className={getButtonClass('Ans', 'operator')}>Ans</button>
+          )}
           <button onClick={() => playClick()} className={getButtonClass('EXP', 'operator')}>EXP</button>
           <button onClick={() => handleOperator('^')} className={getButtonClass('xy', 'operator')}>x<sup>y</sup></button>
           <button onClick={() => handleNumber(0)} className={getButtonClass('0', 'number')}>0</button>
