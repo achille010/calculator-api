@@ -14,6 +14,7 @@ import tangent from "./routes/tangent.js";
 import squareRoot from "./routes/squareRoot.js";
 import ln from "./routes/natLog.js";
 import log10 from "./routes/log10.js";
+import inv from "./routes/inv.js";
 
 import { logger } from "./middleware/logger.js";
 import { controlAccess } from "./middleware/access.js";
@@ -39,6 +40,7 @@ export const serverOn = (port = 3000) => {
   app.use("/sqrt", squareRoot);
   app.use("/ln", ln);
   app.use("/log", log10);
+  app.use("/inv", inv);
 
   app.get("/", (req, res) => {
     res.send(`
